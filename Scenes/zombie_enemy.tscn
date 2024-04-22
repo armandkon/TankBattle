@@ -1,0 +1,82 @@
+[gd_scene load_steps=13 format=3 uid="uid://bq6qpysw50lys"]
+
+[ext_resource type="Script" path="res://Scripts/zombie_enemy.gd" id="1_laeeh"]
+[ext_resource type="Texture2D" uid="uid://kb5ypel3054q" path="res://Sunny Land Collection Files/Packs/zombie_standing.png" id="1_qxe26"]
+[ext_resource type="Script" path="res://Scripts/zombie_life_bar.gd" id="3_fxplg"]
+[ext_resource type="Script" path="res://Scripts/state_machine.gd" id="3_kn3l1"]
+[ext_resource type="Script" path="res://Scripts/Idle.gd" id="4_0ftvt"]
+[ext_resource type="Script" path="res://Scripts/random_timer.gd" id="5_tiuvb"]
+[ext_resource type="Script" path="res://Scripts/Wandering.gd" id="6_3yg5j"]
+[ext_resource type="Script" path="res://Scripts/Chase.gd" id="7_xitxb"]
+[ext_resource type="Script" path="res://Scripts/Attack.gd" id="8_hwui4"]
+[ext_resource type="Script" path="res://Scripts/health_system.gd" id="9_u1771"]
+[ext_resource type="Theme" uid="uid://caskmp53b5u7" path="res://Themes/ui.theme" id="10_43gig"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yg5ss"]
+height = 48.0
+
+[node name="ZombieEnemy" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 39
+script = ExtResource("1_laeeh")
+
+[node name="LifeBar" type="ProgressBar" parent="."]
+offset_left = -20.0
+offset_top = -42.0
+offset_right = 20.0
+offset_bottom = -32.0
+theme = ExtResource("10_43gig")
+value = 20.0
+show_percentage = false
+script = ExtResource("3_fxplg")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_qxe26")
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_yg5ss")
+metadata/_edit_lock_ = true
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+
+[node name="StateLabel" type="Label" parent="."]
+offset_left = -40.0
+offset_top = -48.0
+offset_right = 45.0
+offset_bottom = -25.0
+text = "Wandering"
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("3_kn3l1")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateMachine"]
+script = ExtResource("4_0ftvt")
+
+[node name="IdleTimer" type="Timer" parent="StateMachine/Idle"]
+one_shot = true
+script = ExtResource("5_tiuvb")
+min_time = 12.0
+max_time = 20.0
+
+[node name="RotationTimer" type="Timer" parent="StateMachine/Idle"]
+one_shot = true
+script = ExtResource("5_tiuvb")
+min_time = 0.2
+max_time = 1.0
+
+[node name="Wandering" type="Node" parent="StateMachine"]
+script = ExtResource("6_3yg5j")
+
+[node name="Chase" type="Node" parent="StateMachine"]
+script = ExtResource("7_xitxb")
+
+[node name="Attack" type="Node" parent="StateMachine"]
+script = ExtResource("8_hwui4")
+
+[node name="HealthSystem" type="Node" parent="."]
+script = ExtResource("9_u1771")
+
+[connection signal="timeout" from="StateMachine/Idle/IdleTimer" to="StateMachine/Idle" method="_on_idle_timer_timeout"]
+[connection signal="timeout" from="StateMachine/Idle/RotationTimer" to="StateMachine/Idle" method="_on_rotation_timer_timeout"]
