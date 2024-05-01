@@ -40,20 +40,35 @@ func reload():
 	gun_reload.emit(ammo_in_magazine, total_ammo)
 
 func shoot():
-	if ammo_in_magazine == 0:
-		return
-	
+		
+	if $"../MultiplayerSynchronizer".get_multiplayer_authority() == multiplayer.get_unique_id():
+		if ammo_in_magazine == 0:
+			return
+		ammo_in_magazine -= 1
+		
+# VERY IMPORTANT!
+# should pass local_mouse_position as get_global_mouse_position() in fire() of the player
+# shooting the bullet, else player 2 sees the bullet being shot from player 1 to the point
+# player 2's cursor shows, even though it is located in player 1's screen
+		var local_mouse_position = get_global_mouse_position()
+		fire.rpc(local_mouse_position)
+		
+@rpc("any_peer", "call_local")		
+func fire(local_mouse_position):
 	var bullet = bullet_scene.instantiate() as Bullet
-	bullet.damage = owner.damage_per_bullet
-	get_tree().root.add_child(bullet)
 	
-	var move_direction = (get_global_mouse_position() - global_position).normalized()
-	bullet.move_direction = move_direction
+	bullet.bulletOwner = owner
+	print(bullet.bulletOwner)
+	#bullet.bulletOwner = owner
+	#print(bullet.bulletOwner)
+	bullet.damage = owner.damage_per_bullet	
+	
+	var move_direction = (local_mouse_position - global_position).normalized()
 	bullet.global_position = global_position
+	bullet.move_direction = move_direction
 	bullet.rotation = move_direction.angle()
-	
-	ammo_in_magazine -= 1
-	shot.emit(ammo_in_magazine)
+	get_tree().root.add_child(bullet)
+	shot.emit(ammo_in_magazine)	
 
 func on_ammo_pickup():
 	var ammo_to_add = max_ammo - total_ammo if total_ammo + magazine_size > max_ammo else magazine_size

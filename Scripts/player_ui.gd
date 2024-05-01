@@ -2,7 +2,7 @@ extends CanvasLayer
 
 class_name PlayerUI
 
-@onready  var life_bar = $MarginContainer/LifeBar
+@onready var life_bar = $MarginContainer/LifeBar
 @onready var ammo_container = %AmmoContainer
 @onready var ammo_left_label = %AmmoLeftLabel
 

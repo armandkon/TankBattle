@@ -6,30 +6,43 @@ class_name Player_Human
 @onready var shooting_system = $ShootingSystem as ShootingSystem
 
 @export var damage_per_bullet = 5
-
-@export var player_ui: PlayerUI
 @export var speed = 200
 @export var rotation_speed = 5
 
 var movement_direction: Vector2 =  Vector2.ZERO
 var angle
+var syncPos = Vector2(0, 0)
+var syncRot = 0
 
 func _ready():
-	player_ui.set_life_bar_max_value(health_system.base_health)
-	player_ui.set_max_ammo(shooting_system.magazine_size)
-	player_ui.set_ammo_left(shooting_system.max_ammo)
 	
-	shooting_system.shot.connect(on_shot)
-	shooting_system.gun_reload.connect(on_gun_reload)
-	shooting_system.ammo_added.connect(on_ammo_added)
+	
+	$MultiplayerSynchronizer.set_multiplayer_authority(str(name).to_int())
+	#if $MultiplayerSynchronizer.get_multiplayer_authority() == multiplayer.get_unique_id():
+		#player_ui.set_life_bar_max_value(health_system.base_health)
+	#player_ui.set_max_ammo(shooting_system.magazine_size)
+	#player_ui.set_ammo_left(shooting_system.max_ammo)
+	
+	#shooting_system.shot.connect(on_shot)
+	#shooting_system.gun_reload.connect(on_gun_reload)
+	#shooting_system.ammo_added.connect(on_ammo_added)
 
 func _physics_process(delta):
-	velocity = movement_direction * speed
-	move_and_slide()
 	
-	if angle:
-		global_rotation = lerp_angle(global_rotation, angle, delta * rotation_speed)
-	
+	if $MultiplayerSynchronizer.get_multiplayer_authority() == multiplayer.get_unique_id():
+		
+		velocity = movement_direction * speed	
+		if angle:
+			global_rotation = lerp_angle(global_rotation, angle, delta * rotation_speed)
+		
+		syncPos = global_position
+		syncRot = rotation_degrees
+		
+		move_and_slide()
+	else:
+		global_position = global_position.lerp(syncPos, 0.5)
+		rotation_degrees = lerpf(rotation_degrees, syncRot, 0.5)
+		
 func _input(event):
 	
 	if Input.is_action_pressed("move_down"):
@@ -47,20 +60,20 @@ func _input(event):
 	
 func take_damage(damage: int):
 	health_system.take_damage(damage)
-	player_ui.update_life_bar_value(health_system.current_health)
+	#player_ui.update_life_bar_value(health_system.current_health)
 
-func on_shot(ammo_in_magazine: int):
-	player_ui.bullet_shot(ammo_in_magazine)
+#func on_shot(ammo_in_magazine: int):
+	#player_ui.bullet_shot(ammo_in_magazine)
 
-func on_gun_reload(ammo_in_magazine: int, ammo_left: int):
-	player_ui.gun_reloaded(ammo_in_magazine, ammo_left)
+#func on_gun_reload(ammo_in_magazine: int, ammo_left: int):
+	#player_ui.gun_reloaded(ammo_in_magazine, ammo_left)
 
 func on_ammo_pickup():
 	shooting_system.on_ammo_pickup()
 
-func on_ammo_added(total_ammo: int):
-	player_ui.set_ammo_left(total_ammo)
+#func on_ammo_added(total_ammo: int):
+	#player_ui.set_ammo_left(total_ammo)
 
 func on_health_pickup(health_to_restore: int):
 	health_system.current_health += health_to_restore
-	player_ui.life_bar.value += health_to_restore
+	#player_ui.life_bar.value += health_to_restore
