@@ -18,7 +18,6 @@ func _on_body_entered(body):
 	if body != bulletOwner:
 		if body is Player_Human:
 			body.take_damage(damage)
-	
 		queue_free()
 	pass
 

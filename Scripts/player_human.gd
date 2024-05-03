@@ -7,7 +7,7 @@ class_name Player_Human
 
 @export var damage_per_bullet = 5
 @export var speed = 200
-@export var rotation_speed = 5
+@export var rotation_speed = 20
 
 var movement_direction: Vector2 =  Vector2.ZERO
 var angle
@@ -15,17 +15,17 @@ var syncPos = Vector2(0, 0)
 var syncRot = 0
 
 func _ready():
-	
+	health_system.died.connect(on_died)
 	
 	$MultiplayerSynchronizer.set_multiplayer_authority(str(name).to_int())
-	#if $MultiplayerSynchronizer.get_multiplayer_authority() == multiplayer.get_unique_id():
-		#player_ui.set_life_bar_max_value(health_system.base_health)
-	#player_ui.set_max_ammo(shooting_system.magazine_size)
-	#player_ui.set_ammo_left(shooting_system.max_ammo)
+	if $MultiplayerSynchronizer.get_multiplayer_authority() == multiplayer.get_unique_id():		
+		$CanvasLayer.visible = true
+		shooting_system.shot.connect(on_shot)	
+	else:
+		$CanvasLayer.visible = false
 	
-	#shooting_system.shot.connect(on_shot)
-	#shooting_system.gun_reload.connect(on_gun_reload)
-	#shooting_system.ammo_added.connect(on_ammo_added)
+		#shooting_system.gun_reload.connect(on_gun_reload)
+		#shooting_system.ammo_added.connect(on_ammo_added)
 
 func _physics_process(delta):
 	
@@ -60,7 +60,15 @@ func _input(event):
 	
 func take_damage(damage: int):
 	health_system.take_damage(damage)
-	#player_ui.update_life_bar_value(health_system.current_health)
+	print(health_system.current_health)
+
+func on_died():
+	queue_free()
+
+func on_shot(ammo_in_magazine: int):
+	#print("ammo: ",ammo_in_magazine)
+	#print("Shot!")
+	pass
 
 #func on_shot(ammo_in_magazine: int):
 	#player_ui.bullet_shot(ammo_in_magazine)
