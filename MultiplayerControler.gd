@@ -26,6 +26,11 @@ func peer_connected(id):
 # gets called on all servers and clients
 func peer_disconnected(id):
 	print("Player disconnected " + str(id))
+	GameManager.Players.erase(id)
+	var players = get_tree().get_nodes_in_group("Player")
+	for i in players:
+		if i.name == str(id):
+			i.queue_free()
 
 # called only from clients
 func connected_to_server():
@@ -68,10 +73,12 @@ func hostGame():
 	
 	multiplayer.set_multiplayer_peer(peer)
 	print("Waiting for players")
-	SendPlayerInformation($LineEdit.text, multiplayer.get_unique_id())
+#   line below was move to _on_host_button_down
+	#SendPlayerInformation($LineEdit.text, multiplayer.get_unique_id())
 
 func _on_host_button_down():
 	hostGame()
+	SendPlayerInformation($LineEdit.text, multiplayer.get_unique_id())
 	
 func _on_join_button_down():
 	peer = ENetMultiplayerPeer.new()

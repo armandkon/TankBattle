@@ -22,7 +22,7 @@ properties/3/path = NodePath(".:syncRot")
 properties/3/spawn = true
 properties/3/replication_mode = 1
 
-[node name="PlayerHuman" type="CharacterBody2D"]
+[node name="PlayerHuman" type="CharacterBody2D" groups=["Player"]]
 collision_mask = 99
 script = ExtResource("1_lht31")
 speed = 250
@@ -68,11 +68,6 @@ value = 20.0
 show_percentage = false
 script = ExtResource("5_r8tae")
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_interval = 0.01
-delta_interval = 0.01
-replication_config = SubResource("SceneReplicationConfig_vsgo3")
-
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="BulletsLabel" type="Label" parent="CanvasLayer"]
@@ -87,6 +82,11 @@ Total Ammo:"
 horizontal_alignment = 1
 vertical_alignment = 1
 script = ExtResource("7_ni0tm")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_interval = 0.01
+delta_interval = 0.01
+replication_config = SubResource("SceneReplicationConfig_vsgo3")
 
 [connection signal="damage_taken" from="HealthSystem" to="Lifebar" method="_on_health_system_damage_taken"]
 [connection signal="timeout" from="ShootingSystem/Timer" to="ShootingSystem" method="_on_timer_timeout"]
