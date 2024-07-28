@@ -5,7 +5,7 @@ class_name HealthSystem
 signal died
 signal damage_taken(current_health: int)
 
-@export var base_health = 15
+@export var base_health = 25
 var current_health
 
 func _ready():

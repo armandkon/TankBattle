@@ -11,9 +11,17 @@ config_version=5
 [application]
 
 config/name="TankBattle"
-run/main_scene="res://main.tscn"
+run/main_scene="res://MultiplayerScene.tscn"
 config/features=PackedStringArray("4.2", "Mobile")
 config/icon="res://icon.svg"
+
+[autoload]
+
+GameManager="*res://GameManager.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_rl_agents/plugin.cfg")
 
 [input]
 
