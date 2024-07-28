@@ -19,6 +19,10 @@ config/icon="res://icon.svg"
 
 GameManager="*res://GameManager.gd"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_rl_agents/plugin.cfg")
+
 [input]
 
 move_right={

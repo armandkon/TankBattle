@@ -13,6 +13,7 @@ var movement_direction: Vector2 =  Vector2.ZERO
 var angle
 var syncPos = Vector2(0, 0)
 var syncRot = 0
+var is_ai = false
 
 func _ready():
 	health_system.died.connect(on_died)
